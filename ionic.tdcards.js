@@ -433,7 +433,7 @@
             controller: ['$scope', '$element', '$attrs', 'TDCardDelegate', function($scope, $element, $attrs, TDCardDelegate) {
                 TDCardDelegate._register($attrs.delegateHandle, this);
                 $scope.$on('$destroy', function() {
-                    DCardDelegate._unregister($attrs.delegateHandle);
+                    TDCardDelegate._unregister($attrs.delegateHandle);
                 });
                 var cards;
                 var firstCard, secondCard, thirdCard;
