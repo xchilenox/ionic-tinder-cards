@@ -320,6 +320,7 @@
                     // Instantiate our card view
                     var swipeableCard = new SwipeableCardView({
                         el: el,
+                        $scope: $scope,
                         leftText: leftText,
                         rightText: rightText,
                         onPartialSwipe: function(amt) {
