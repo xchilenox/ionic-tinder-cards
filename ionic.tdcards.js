@@ -34,6 +34,7 @@
 
             ionic.extend(this, opts);
 
+            this.$q = opts.$q;
             this.el = opts.el;
 
             this.parentWidth = this.el.parentNode.offsetWidth;
@@ -111,32 +112,18 @@
             this.el.classList.remove(animationClass);
         },
 
+        swipeRight: function() {
+            return this.transitionOut("right");
+        },
+        swipeLeft: function() {
+            return this.transitionOut("left");
+        },
+
         /**
          * Swipe a card out programtically
          */
         swipe: function(direction) {
-            var deferred = Promise.defer();
-            var deltaX = (direction === 'left') ? -1 : 1;
-            var count = 0;
-            var maxCount = 400;
-            var self = this;
-            var interval = setInterval(function() {
-                var e = new Event('gesture');
-                e.gesture = {
-                    deltaX: Math.floor(deltaX * count),
-                    deltaY: 0,
-                    velocityX: 0.5
-                };
-                if (count >= maxCount) {
-                    clearInterval(interval);
-                    self.transitionOut(e);
-                    deferred.resolve();
-                } else {
-                    self._doDrag(e)
-                }
-                count = count + 15;
-            }, 1);
-            return deferred.promise;
+            return this.transitionOut(direction);
         },
 
         /**
@@ -156,41 +143,54 @@
         transitionOut: function(e) {
             var self = this;
 
-            if (this.isUnderThreshold()) {
+            var isGestureSwipe = (typeof e === "object");
+            var swipeRight = isGestureSwipe ? this.x > 0 : e === "right";
+
+            if (isGestureSwipe && this.isUnderThreshold()) {
                 self.onSnapBack(this.x, this.y, this.rotationAngle);
                 return;
             }
 
-            self.onTransitionOut(self.thresholdAmount);
-            var angle = Math.atan(e.gesture.deltaX / e.gesture.deltaY);
+            self.onTransitionOut(isGestureSwipe ? self.thresholdAmount : swipeRight ? 0.5 : -0.5);
 
-            var dir = this.thresholdAmount < 0 ? -1 : 1;
-            var targetX;
-            if (this.x > 0) {
+            var angle, targetX, targetY, velocityX, rotateTo;
+
+            if (swipeRight) {
                 targetX = (this.parentWidth / 2) + (this.width);
             } else {
                 targetX = -(this.parentWidth + this.width);
             }
 
-            // Target Y is just the "opposite" side of the triangle of targetX as the adjacent edge (sohcahtoa yo)
-            var targetY = targetX / Math.tan(angle);
+            if (isGestureSwipe) {
+                angle = Math.atan(e.gesture.deltaX / e.gesture.deltaY);
+                // Target Y is just the "opposite" side of the triangle of targetX as the adjacent edge (sohcahtoa yo)
+                targetY = targetX / Math.tan(angle);
+                velocityX = e.gesture.velocityX;
+                rotateTo = this.rotationAngle;
+            } else {
+                angle = -1.5;
+                targetY = 100;
+                velocityX = 0.5;
+                rotateTo = -0.2;
+            }
 
-            // Fly out
-            var rotateTo = this.rotationAngle; //(this.rotationAngle this.rotationDirection * 0.2));// || (Math.random() * 0.4);
-
-            var duration = 0.3 - Math.min(Math.max(Math.abs(e.gesture.velocityX) / 10, 0.05), 0.2);
+            var duration = 0.3 - Math.min(Math.max(Math.abs(velocityX) / 10, 0.05), 0.2);
 
             ionic.requestAnimationFrame(function() {
-                self.el.style.transform = self.el.style.webkitTransform = 'translate3d(' + targetX + 'px, ' + targetY + 'px,0) rotate(' + self.rotationAngle + 'rad)';
+                self.el.style.transform = self.el.style.webkitTransform = 'translate3d(' + targetX + 'px, ' + targetY + 'px,0) rotate(' + rotateTo + 'rad)';
                 self.el.style.transition = self.el.style.webkitTransition = 'all ' + duration + 's ease-in-out';
             });
 
-            //this.onSwipe && this.onSwipe();
+            var deferred = this.$q.defer();
 
             // Trigger destroy after card has swiped out
             setTimeout(function() {
+                self.destroyed = true;
                 self.onDestroy && self.onDestroy();
+                deferred.resolve();
             }, duration * 1000);
+
+            return deferred.promise;
         },
 
         /**
@@ -275,7 +275,7 @@
 
     angular.module('ionic.contrib.ui.tinderCards', ['ionic'])
 
-    .directive('tdCard', ['$timeout', function($timeout) {
+    .directive('tdCard', ['$timeout', '$q', function($timeout, $q) {
         /**
          * A simple non-linear fade function for the text on each card
          */
@@ -320,6 +320,7 @@
                     // Instantiate our card view
                     var swipeableCard = new SwipeableCardView({
                         el: el,
+                        $q: $q,
                         $scope: $scope,
                         leftText: leftText,
                         rightText: rightText,
