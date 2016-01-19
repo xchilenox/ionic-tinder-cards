@@ -1,0 +1,156 @@
+$gray: #ecf0f1;
+$red: #e74c3c;
+$green: #1abc9c;
+$blue: #11c1f3;
+$dark: #000;
+$light: #fff;
+$size: 140px;
+
+@mixin animation($animation) {
+ -webkit-animation: $animation;
+         animation: $animation;
+}
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} { @content; };
+  @-moz-keyframes #{$name} { @content; };
+  @-ms-keyframes #{$name} { @content; };
+  @-o-keyframes #{$name} { @content; };
+  @keyframes #{$name} { @content; };
+}
+
+td-cards {
+  display: block;
+  position: relative;
+  height: 75%;
+
+  td-card {
+    display: block;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    margin-left: -150px;
+    min-width: 200px;
+    min-height: 200px;
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 6px;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      border: 1px solid $blue;
+      border-radius: 3px;
+    }
+
+    .text {
+      position: absolute;
+      top: 20px;
+      padding: 10px;
+      font-size: 30px;
+      opacity: 0;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .yes {
+      @extend .text;
+      left: 10px;
+      color: $green;
+      border: 2px solid $green;
+    }
+
+    .no {
+      @extend .text;
+      right: 10px;
+      color: $red;
+      border: 2px solid $red;
+    }
+
+    .caption {
+      background-color: rgba($blue, 0.5);
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      padding: 10px;
+      border-top: 1px solid $blue;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+
+      .title {
+        color: $light;
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .description {
+        color: $light;
+        margin: 0;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+td-pulse {
+  position: absolute;
+  display: table;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  img {
+    position: absolute;
+    width: $size;
+    height: $size;
+    top: 50%;
+    margin-top: -($size/2);
+    margin-left: -($size/2);
+    border-radius: 50%;
+    border: 1px solid $red;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient($light 25%, $red);
+    z-index: -1;
+    transform: translateY(-50%) translateX(-50%);
+    border-radius: 50%;
+    opacity: 0;
+    border: 2px solid $red;
+    @include animation(pulse 1.5s linear infinite);
+    @include keyframes(pulse) {
+      0% { opacity: 0; width: $size; height: $size; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  }
+}
+
+td-controls {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 25%;
+  text-align: center;
+  z-index: 30;
+  td-control-button {
+    margin: 5px -5px;
+    border: 8px solid $gray;
+    padding: 16px;
+    background-color: $light;
+    top: 5px;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    display: inline-block;
+
+    .button.yes .icon:before { color: $green; }
+    .button.no .icon:before { color: $red; }
+    .button .icon:before { font-size: 40px; }
+  }
+}

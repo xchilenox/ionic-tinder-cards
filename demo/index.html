@@ -1,43 +1,43 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title>Ionic Seed App</title>
+<html ng-app="App">
+<head>
+	<title>Ionic Tinder Cards</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<link href="http://code.ionicframework.com/1.2.4/css/ionic.min.css" rel="stylesheet" />
+	<link href="../dist/ion-tinder-cards.min.css" rel="stylesheet" />
+</head>
+<body ng-controller="AppController">
+	<ion-header-bar class="bar-calm">
+		<h1 class="title">Ionic Tinder Cards</h1>
+	</ion-header-bar>
+	<ion-content scroll="false">
 
-    <!-- ionic css -->
-    <link href="../../ionic/dist/css/ionic.css" rel="stylesheet">
-    <link rel="stylesheet" href="app.css">
+		<td-pulse ng-if="pulse">
+			<img src="http://api.randomuser.me/portraits/med/women/35.jpg" />
+		</td-pulse>
 
-    <!-- angularjs scripts -->
-    <script src="../../ionic/dist/js/ionic.bundle.js"></script>
+		<td-cards delegate-handle="cards" ng-if="cards.length > 0">
+			<td-card ng-repeat="card in cards" on-destroy="remove($index)" on-transition-left="reject($index)" on-transition-right="like($index)">
+				<span class="no">NOPE</span>
+				<span class="yes">LIKE</span>
+				<img ng-src="{{card.image}}" width="300" height="300" />
+				<div class="caption">
+					<h2 class="title">{{card.name}}, {{card.age}}</h2>
+					<p class="description">{{card.description}}</p>
+				</div>
+			</td-card>
+		</td-cards>
 
-    <!-- cordova script -->
-    <script src="cordova.js"></script>
+		<td-controls ng-if="cards.length > 0">
+			<td-control-button action="no" icon="ion-close" ng-click="swipeLeft()"></td-control-button>
+			<td-control-button action="yes" icon="ion-heart" ng-click="swipeRight()"></td-control-button>
+		</td-controls>
 
-    <script src="app.js"></script>
-    <script src="../../collide/collide.js"></script>
-    <script src="../ionic.tdcards.js"></script>
-  </head>
+	</ion-content>
 
-  <!-- 
-    'starter' is the name of this angular module (js/app.js)
-  -->
-  <body ng-app="starter" no-scroll>
-    <ion-pane ng-controller="CardsCtrl">
-      <ion-header-bar class="bar-default">
-        <h1 class="title">TD Cards</h1>
-      </ion-header-bar>
-
-      <td-cards>
-        <td-card ng-repeat="card in cards" on-destroy="cardDestroyed($index)" on-swipe-left="cardSwipedLeft($index)" on-swipe-right="cardSwipedRight($index)" on-partial-swipe="cardPartialSwipe(amt)" class="card-{{$index}}">
-          <div class="image" ng-controller="CardCtrl">
-            <div class="no-text">NOPE</div>
-            <img ng-src="{{card.image}}">
-            <div class="yes-text">LIKE</div>
-          </div>
-        </td-card>
-      </td-cards>
-    </ion-pane>
-  </body>
+	<script src="http://code.ionicframework.com/1.2.4/js/ionic.bundle.min.js"></script>
+	<script src="../bower_components/collide/collide.js"></script>
+	<script src="../dist/ion-tinder-cards.min.js"></script>
+	<script src="app.js"></script>
+</body>
 </html>

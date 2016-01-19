@@ -1,52 +1,76 @@
-// Ionic Starter App, v0.9.20
+(function() {
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'ionic.contrib.ui.tinderCards' is found in ionic.tdcards.js
-angular.module('starter', ['ionic', 'ionic.contrib.ui.tinderCards'])
+	'use strict';
 
-.directive('noScroll', function() {
+	angular
+		.module('App', ['ionic', 'ionTinderCards'])
+		.controller('AppController', AppController);
 
-  return {
-    restrict: 'A',
-    link: function($scope, $element, $attr) {
+	AppController.$inject = ['$scope', '$timeout', 'TDCardDelegate'];
 
-      $element.on('touchmove', function(e) {
-        e.preventDefault();
-      });
-    }
-  }
-})
+	function AppController($scope, $timeout, TDCardDelegate) {
+		$scope.cards = [];
+		$scope.list = [
+			{
+			  name: 'User 1',
+			  age: 26,
+			  image: 'http://api.randomuser.me/portraits/med/women/39.jpg',
+			  description: 'Lorem ipsum dolor sit amet'
+			},
+			{
+			  name: 'User 2',
+			  age: 34,
+			  image: 'http://api.randomuser.me/portraits/med/men/39.jpg',
+			  description: 'Lorem ipsum dolor sit amet'
+			},
+			{
+			  name: 'User 3',
+			  age: 66,
+			  image: 'http://api.randomuser.me/portraits/med/lego/2.jpg',
+			  description: 'Lorem ipsum dolor sit amet'
+			},
+			{
+			  name: 'User 4',
+			  age: 31,
+			  image: 'http://api.randomuser.me/portraits/med/women/38.jpg',
+			  description: 'Lorem ipsum dolor sit amet'
+			}
+		];
 
-.controller('CardsCtrl', function($scope, TDCardDelegate) {
-  var cardTypes = [
-    { image: 'max.jpg' },
-    { image: 'ben.png' },
-    { image: 'perry.jpg' },
-  ];
+		$scope.getCards = function() {
+			$scope.pulse = true;
+			$timeout(function() {
+				angular.forEach($scope.list, function(card) {
+					$scope.cards.push(card);
+				});
+				$scope.pulse = false;
+			}, 1700);
+		};
 
-  $scope.cardDestroyed = function(index) {
-    $scope.cards.splice(index, 1);
-  };
+		$scope.remove = function(index) {
+			$scope.cards.splice(index, 1);
+			if($scope.cards.length <= 0) {
+				$scope.getCards();
+			}
+		};
 
-  $scope.addCard = function() {
-    var newCard = cardTypes[Math.floor(Math.random() * cardTypes.length)];
-    newCard.id = Math.random();
-    $scope.cards.unshift(angular.extend({}, newCard));
-  }
-  
-  $scope.cards = [];
-  for(var i = 0; i < 3; i++) $scope.addCard();
-})
+		$scope.reject = function(index) {
+			console.log('LEFT SWIPE');
+		};
 
-.controller('CardCtrl', function($scope, TDCardDelegate) {
-  $scope.cardSwipedLeft = function(index) {
-    console.log('LEFT SWIPE');
-    $scope.addCard();
-  };
-  $scope.cardSwipedRight = function(index) {
-    console.log('RIGHT SWIPE');
-    $scope.addCard();
-  };
-});
+		$scope.like = function(index) {
+			console.log('RIGHT SWIPE');
+		};
+
+		$scope.swipeLeft = function() {
+			TDCardDelegate.$getByHandle('cards').getFirstCard().swipe('left');
+		};
+
+		$scope.swipeRight = function() {
+			TDCardDelegate.$getByHandle('cards').getFirstCard().swipe('right');
+		};
+
+		$scope.getCards();
+	}
+
+})();
