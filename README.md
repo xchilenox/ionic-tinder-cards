@@ -1,8 +1,12 @@
 Ionic Tinder Cards
 ===================
 
-Swipeable card based layout for Ionic and Angular. As seen in apps like [Tinder](http://www.gotinder.com/)  
+This is a fork of a [fork](https://github.com/Bixev/ionic-ion-tinder-cards) of the [original repository](https://github.com/driftyco/ionic-ion-tinder-cards).
+
+Swipeable card based layout for Ionic and Angular. As seen in apps like [Tinder](http://www.gotinder.com/)
 Note: There is also a similar ion library here: https://github.com/driftyco/ionic-ion-swipe-cards where you swipe the cards down instead of left or right.
+
+[Demo on Codepen](http://codepen.io/chileno/pen/obweay)
 
 ## Install
 
